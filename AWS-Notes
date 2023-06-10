@@ -1,0 +1,141 @@
+10/6/2023
+
+Cloud Computing
+----------------------
+ON demand provisioning of IT resources over the internet on rent
+
+IT resources 
+--------------
+s/w(OS,db,app,packages) +h/w(server,storage,n/w)
+
+
+renting a cab vs owning a car
+
+
+scalable 
+available
+cost effective (pay-per-use)
+redundant
+Agility --> quickly deploy the resources
+complexity --> less complex
+
+Disadvantage
+1) less control
+2)vendor locking  --> RDS -->aurora db
+
+Security --> joint responsibility model -->both providers and consumers take charge of security 
+
+https://aws.amazon.com/certification/certified-solutions-architect-associate/?ch=sec&sec=rmg&d=1
+free tier account
+-------------------
+--> validity --> 1year
+
+aws.amazon.com
+
+email id 
+password
+personal info
+account type --> basic & personal
+card details
+
+
+--> free tier limit for certain services
+ex:- s3 storage --> free tier limit --> upto 5GB
+
+
+AWS Global infrastructure
+------------------------------
+1) AWS region --> geographical area
+2) AWS AZ --> collection of DC
+--> each region has atleast 2 AZ
+3)Edge locations -- Cache locations for caching data
+4)local zone --> its an extension to aws region for latency sensitive aplications.
+--> a single digit milisec latency to users
+--> ex:- VPC,EBS,ELB,file storage,EC2
+
+scalability
+----------------
+--> resizing
+--> vertical scaling --> scale-up,scale-down
+adding or removing resources from existing server(resources)
+changing the configuration of existing server is vertical scaling
+--> horizontal scaling --> scale-in(removing), scale-out(adding)
+adding more servers(resources)
+
+autoscaling service
+
+Ec2 (to be discussed in ec2)
+-----
+stateless application
+stateful application
+
+
+security
+----------
+shared responsibility model
+
+cost optimization
+-------------------
+1) start from the lower config resources
+2) scaling
+3) Budgets, billing alerts, reserved instances, cost savings plan
+4) re-evaluate time to time
+5) Terminate/stop  unused resource (auto shutdown)
+6)Monitoring of unused resources
+7) data archival planning (Chose storage based on requirements- like cold, hot, archive etc)
+8) Automate resource provisioning as much as possible 
+9) serverless resources
+10) minimizing software license cost
+11)Use Yearly billing instead of Monthly billing. It may reduce the overall subscription charge.
+12)Using cache storage instead of servers instead of deploying physical servers at multiple locations.
+
+AWS core services
+------------------------
+1)server --> Ec2
+2)storage --> s3
+3)network --> VPC
+4)database --> RDS
+
+IAM (identity access management)
+---------------------------------------
+--> security
+--> free service
+--> global service
+--> using IAM we can create additional identities & manage access to identities
+--> IAM allows me to create users
+1)User --> IAM user (local users or native users of an account)
+Ec2admin <--attach Ec2 policy
+s3admin
+VPCadmin
+RDSadmin
+Backupadmin
+2)group
+3)policy --> predefined authorization provided by AWS, managed by aws
+--> can attach policy to user,group , role
+4)role
+
+Agenda
+--------
+IAM
+VPC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
