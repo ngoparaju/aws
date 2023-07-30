@@ -2,7 +2,7 @@
 
 Cloud Computing
 ----------------------
-ON demand provisioning of IT resources over the internet on rent
+ON demand provisiong of IT resources over the internet on rent
 
 IT resources 
 --------------
@@ -21,7 +21,7 @@ complexity --> less complex
 
 Disadvantage
 1) less control
-2)vendor locking  --> RDS -->aurora db
+2)vendor locking  --> RDS -->auroradb
 
 Security --> joint responsibility model -->both providers and consumers take charge of security 
 
@@ -119,23 +119,895 @@ Agenda
 IAM
 VPC
 
+11/6/2023
+------------
+
+To get account creation date
+----------------------------------
+
+https://us-east-1.console.aws.amazon.com/billing/rest/v1.0/account
+https://www.epochconverter.com/#tools
+
+
+AWS --> support service (for checking current plan i:e free tier or something else)
+
+ARN --> amazon resource name
+
+AWS user --> aws services --> diff modes of access --> AWS management console(GUI), programmatic acces(CLI),SDK,API
+
+Hands-on
+-----------
+create IAM user & logon 
+
+Programmatic access
+------------------------
+--> access & secret access keys
+
+
+AWS CLI configuration
+------------------------------
+
+aws configure
+
+Output format--> json,yaml,text,table
+
+aws ec2 describe-instances --output yaml --region us-east-1
+aws ec2 describe-instances --output table --region us-east-1
+aws ec2 describe-instances --output text
+
+
+aws configure --profile profile_name
+aws s3 ls --profile profile_name
+
+MFA configuration
+
+group
+------
+developers --> dev1,dev2,dev3...dev50 <-- devadmingroup <--policy
+
+policy
+--------
+-->predefined json document for permissions
+--> predefined authorization
+
+create custom policy to control access over user authorization
+
+1) identity based policy --> attached to identities 
+user,group,role
+2) resource based policy --> attached to resources
+
+PARC model --> P-principle, A-access, R-resorces, C-condition
+
+17/6/2023
+creating custom policy(to be done demo)
+-------------------------
+--> granular control on the user authorization
+
+
+
+any value
+
+value  --> us-east-1 or ap-south-1 or us-east-2
+
+all value
+value  --> us-east-1 & ap-south-1 & us-east-2
+
+Role
+-------
+1) role for service
+service1(assume a role) --> service2
+ex:-  EC2(VM/VS/instance)(assume a role) --> s3(storage)
+
+OS user --> ec2-user
+
+
+lambda --> dynamodb
+cw --> lambda
+sns --> lambda
+
+2) role for cross account resource sharing
+root(diff 12digit acc id) --> AWS acc1 --> test
+root--> AWS acc2 --> dev --> data(s3 storage)
+root --> AWS acc3 --> Prod (place arn of the role created in source account in the policy of target account)
+
+3) role for federated users
+--> externals
+a) Corporate Identity federation -> organization maintains user credentails either in microsoft AD/LDAP
+b) web identity federation --> public identity
+ex:- fb,amazon.com,google
+
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml.html
+
+
+putty --> ssh
+
+VPC (virtual private cloud)
+-----
+--> networking service
+--> security to resources
+--> isolated section of public cloud
+--> regional service
+--> AWS --> default VPC
+custom VPC
+--> VPC reqd for EC2 deployment
+--> 5 VPC per region
+--> 200 subnets per VPC
+
+--> subnet 
+Protected
+Public subnet
+Private subnet
+--> route table -- it defines route to destination
+--> internet gateway
+--> NAT gateway --> chargeable
+--> NAT instance
+--> Sg
+--> NACL
+--> CIDR
+--> ipaddresses
+--> Elastic ip --> unused EIP is chargeable
+
+18/6/2023
+
+ipaddresses --> to be discussed 
+
+ CIDR (classless interdomain routing)
+-------------------------------------------
+-->provides range of IPs
+--> CIDR range --> 16 & 28
+
+ipv4
+-----
+--> 32-bit
+10.2.0.10
+(0-255)
+0.0.0.0
+10.2.1.21
+2^32--> 4,294,967,296
+
+x.x.x.x/n--> CIDR(16 & 28)
+
+1.0.0.0/16, 32-16=16 , 2^16=65536 ipaddresses
+1.0.0.0/20, 32-20=12,2^12=4096
+1.0.0.0/24,32-24=8,2^8=256
+1.0.0.0/28,32-28=4,2^4=16 ipadresses
+
+
+1.0.0.0/32 , 32-32=0, 2^0=1
+
+
+
+Reserved IPs in subnet
+--------------------------
+1.0.0.0 ---> network address
+1.0.0.1 ----> reserved by aws for VPC router
+1.0.0.2 ----> reserved by aws DNS server
+1.0.0.3----> reserved by aws future use
+1.0.0.255 ---> n/w broadcast address
+
+--> in every subnet 5 ips are reserved by amazon
+
+ipv6
+---------
+--> 128-bit
+--> 2^128
+--> x:x:x:x:x:x:x:x
+8*16=128
 
 
 
 
+10.2.0.10/24
+N/w+Hostid
+
+
+webserver to dbserver connection
+--------------------------------------------
+
+ vi dbkey.pem  ( press i for inserting data ), (esc :wq for save & exit)
+chmod 400 dbkey.pem
+ ssh -i dbkey.pem ec2-user@Private_ip_dbserver
+
+
+NAT instance
+---------------
+1) select AMI from community AMI (filter for NAT)
+2) get EIP & associate to NAT instance
+3) stop source destination check
+4) add NAT instance in private route table
+5) modified SG --> open icmp-ipv4 port
+
+
+11.0.0.0/16
+
+1.0.0.0/16
+2.0.0.0/16
+20.0.0.0/16
+
+11.0.0.0/16 --> CIDR vpc
+11.0.1.0/24 --> CIDR pubsub
+11.0.2.0/24 --> CIDR privsub
+
+
+To be discussed
+---------------------
+SG,NACL,VPC endpoint, Flow log
+
+24/6/2023
+---------------
+SG
+---
+--> virtual firewall across your instance
+--> Default rule --> INbound --> everthing is denied
+ OUtbound --> everything is allowed
+--> allows only allow rule
+--> statefull in nature
+-->one instance can use only one SG at a time
+
+--> one SG can be shared with multiple instances
+
+NACL
+--------
+--> virtual firewall across subnet
+--> Default rule 
+INbound & OUtbound --> everything is allowd
+--> stateless in nature
+--> one subnet can use only one NACL at a time
+--> One NACL can be shared by multiple subnets
+--> you can define both allow & deny rules
+
+VPC endpoint
+-----------------
+--> virtual devices
+--> horizontally scaled,redundant, highly available VPC components
+--> it privately connects VPC to supported AWS services
+1) gateway endpoint --> it requires routing change,free,supported by s3 & dynamodb
+2)interface endpoint --> it does not require a routing change, per hour port charge , supported by other services
+
+VPC peering
+--------------
+--> peering connection has to be done explicitly between 2 diff VPCs
+--> Transitive peering is not supported 
+--> 2 VPCs with same CIDR cannot be peered
+--> peering is supported across regions & across AWS accounts
+
+OHio --> aws acc1 --> VPC A --> 10.0.0.0/16
+mumbai --> AWS acc2 -->VPC B --> 11.0.0.0/16
+
+
+TRansit gateway (to be discussed)
+VPC endpoint --> demo done
+
+
+
+EC2(elastic compute cloud)
+---------------------------------
+--> VS/VM/instance
+--> Core service
+--> popular service for deployment os appln
+--> MAchine configuration --> instance type --> CPU, Mem, N/w
+--> OS --> AMI (amazon machine image) --> Linux,windows,MAC
+preinstalled OS image,repositories,built-in package, launch perm, backed by storage vol(EBS vol & instance store vol)
+--> free tier --> upto 750hrs per month of t2.micro of linux/windows instance is free
+EBS vol & instance store vol
+
+EBS vol(elastic block store)
+-----------------------------------
+--> similar to Hard disk
+--> persistent in nature
+--> block based storage
+--> free tier --> upto 30GB per month
+--> One EBS vol can be attached to one instance at a time
+--> diff types 
+1) SSD
+2)HDD
+3)magnetic
+
+
+Instance store vol(ephemeral vol)
+---------------------------------------
+--> similar to RAM  -->volatile 
+--> performance is good
 
 
 
 
+.pem -->puutykeygen -->  .ppk 
+
+
+Linux webserver
+--------------------
+sudo su -
+    1  yum install httpd -y
+    2  cd /var/www/html/
+    3  vi index.html  ( press 'i' ) (saving --> esc :wq)
+    4  systemctl start httpd
+    5  systemctl enable httpd
+    6  history
+
+windows webserver
+-------------------------
+Install-WindowsFeature -name Web-Server -IncludeManagementTools
+
+
+sample html file
+---------------------
+
+<html>
+<body style="background-color:yellow;">
+
+<h1>Welcome to aws windows Webserver </h1>
+<p> â€œYou learn more from failure than from success. Donâ€™t let it stop you. Failure builds character.â€
+  "Challenges are what make life interesting and overcoming them is what makes life meaningful". </p>
+
+</body>
+</html>
+
+<html>
+<body>
+
+Golden image
+---------------
+--> custom AMI
+--> complete snapshot of your EC2 instance(whatever is deployed on EC2)
+--> OS+customization(Apache)
+--> DR Disaster recovery
+--> cloning
+--> Autoscaling (horizontal scaling)
+--> deployment of customized EC2 instance in a diff region
+
+25/6/2023
+
+Peering connection steps
+-----------------------------
+1) use peering connection option from VPC dashboard to create peering between 2 VPCs
+2) Accept the peering request (from ACtions)
+3) Modify route table ( exchange VPC CIDR between peered VPCs in route table)
+4) Deploy EC2 instance in each VPC & verify access over private ip (just like a communication between WS & dbserver)
 
 
 
+Hands-on 
+
+Creating GI & deploying EC2 using GI --> 10mins
+
+
+EBS vol
+----------
+Attach/Detach Vol
+MOdifying Vol attributes
+Vol snapshot creation
+Root vol snashot for launching instance
+
+Modifying EBS vol attributes
+1) change Vol type
+2)increase size
+
+3) Change AZ 
+existing ebs data vol(us-east-1a) --> creating snapshot --> creating volume out of this snapshot(restoring vol) (change AZ --> us-east-1b)
+
+
+root vol --> create a snapshot --> create image --> launch instance
+
+diff betn GI & root vol snapshot image
+
+Tenancy Model
+1)Shared
+2)Dedicated Instance
+3)Dedicated host
+
+Hands-on 
+-------------
+Task for EC2
+-------------------
+1) Launch EC2 , connect to EC2 , configure webserver
+2) creating Golden Image, launch EC2 using GI
+3) create additional EBS vol, attach to instance , verify
+4) Detach EBS vol , verify
+5) Modify EBS vol size & type , verify
+6) Snapshot datavol(with actual data) ,restore , verify
+7)snapshot rootvol , launh instance using this snapshot
+8) make GI public,verify
+
+
+https://community.simplilearn.com/forums/pgp-cc-jun-2023-cohort-2.1557/
+
+Task for IAM
+----------------
+1) creating an IAM user,attaching policy
+2) Configure MFA for user
+3)configure programmatic access
+4) create custom policy
+5) creating role for interservice communication
+
+
+TAsk for VPC
+-----------------
+1) creating custom VPC
+2) creating , subnet,route table,Internet gateway
+3) Elastic ip
+4) VPC peering
+5) VPC endpoint
+6) creating route table
+7) NAT gateway & NAT instance
+
+1/7/2023
+
+ELB
+-------
+1)ALB
+2)NLB
+
+Autoscale
+--------------
+1)launch template
+2) Autoscaling group
+
+Cost optimization of EC2
+-----------------------------
+purchasing option
+----------------------
+1) On-demand ->  pay-as-you-go
+2) Reserved --> period of 1yr or 3 yrs, cost saving upto 75%
+pymt option
+a) all upfront
+b)partial upfront
+c) no upfront
+
+--> std reserved
+--> convertible reserved
+
+t3.large --> t34xlarge
+
+3) Spot --> savings upto 90%
+--> unused compute capacity available in aws data centers & offered to customers on an auction
+--> spot gets interrupted in a short notice of 2 mins when unused compute capacity goes low & your bid price goes low
+
+spot block --> reserve spot instance for a small duration upto 6hrs
+use case --> mixed environment, flexible environment, testing, educational purpose
+
+
+4) Dedicated 
+
+5) Saving plans --> more flexible
+--> savings upto 72%
+--> commitment of using a specified amount of compute power(measured per hour) for 1yr or 3yrs period
+pymt option
+a) all upfront
+b)partial upfront
+c) no upfront
+
+s3 (simple storage service)
+-------------------------------
+--> object based storage service
+--> can't deploy OS/DB/APPl/FS
+--> migrate data from on-prem to cloud in s3 bucket
+--> can't edit a file
+--> can store any format file
+Use case --> to store/keep the backup/snapshots/data for long term archive
+-> unlimited storage capacity
+--> charges are based on amount of data stored
+--> global service
+--> bucket
+--> 100 bucket per account
+--> no limit on the no of objects inside bucket
+--> largest object size supported is 5TB
+--> 11 9's durability --> 99.999999999
+--> host a static website
+
+1)upload object in s3
+2) change perm of object
+3) host static website
+
+--> Versioning --> 
+--> it allows me to create/upload multiple versions of the objects
+--> it allows me to undelete a deleted object
+1)Unversioned
+2)Versioning Enabled
+3)Versioning suspended
+
+-> life cycle rules --> automate the transitioning from one s3 storage type to another s3 storage type
+--> transfer acceleration
+-->CRR/SRR
+
+--> multipart upload 
+any object larger than 100MB should be uploaded in multiple parts
+
+--> encryption
+1)SSE-s3
+2)SSE-KMS
+3)SSE-C
+
+s3 storage types 
+----------------
+1) s3 standard --> hot data , business critical data which requires immed access to data , frequently accesses data, expensive
+2) s3 std IA --> warm data, intermittent access to data, data is imp
+ex:- OS backup, db backup,appl backup
+less expensive compare to s3 std, per gb cost is less
+3)RR --> data not imp, data can be reproduced easily ,low cost
+4)glacier --> cold data,long term archive, retrivel time is between 3 to 5 hrs
+5)glacier deep archive --> coldest data, cheapest , retrivel time is betn 10 to 12 hrs
+
+Route53
+-----------
+Route53
+--------
+--> DNS service
+--> managed by aws
+--> route the user request to aws resources (e:g -- EC2, ELB,s3,CF)
+
+FQDN
+--------
+www.simplilearn.com
+
+Record
+-------
+--> records are stored in a zone file , which is stored in DNS/NS server
+
+A --> map a domain name to ipv4 ipadrress
+AAAA --> map a domain name to ipv6 ipadrress
+CNAME --> map one domain name to another domaninname or one subdomain to another subdomain
+
+simplilearn.com
+lms.simplilearn.com
+
+Alias record --> used to route user request to aws resource
+ex:-  domain name --> ELB endpoint
+domain name --> CF endpoint
+domain name --> s3 static website endpoint
+
+Routing policies
+--------------------
+1)simple --> route a user request to single resource
+2)weighted --> route the user request based on the weight, used in AB testing environment
+3)latency based
+4)failover --> Active-Passive
+5)geolocation --> to serve  localised content to end user
+
+Homework
+---------------
+1)define Bucket policy to provide access to one user
+2)create two way replication in s3 service
+
+8/7/2023
+Database
+--------------
+
+AuroraDB
+Dynamodb
+
+Relational/sql/structured --> REad Replicas
+----------------------------------------------
+Use Case
+--> traditional applications
+--> ERP
+--> ecommerce
+AWS service
+-----------------
+1)RDS --> partially managed
+Auroradb,mysql,microsoftsql,mariadb,postgres,oracle
+VM+OS+db
+2)AMI based approach 
+VM+OS+db
+--> database administration & management is customer responsibility
+3) Manual approach
+--> VM(base OS)
+--> DB installation to DB management is cust resp
+
+--> fixed schema
+--> querying using sql
+--> vertical scaling
+--> strong consistency
+
+Non-relational/Nosql/unstructured
+-----------------------------------------
+Use case
+----------
+--> Big data environment
+--> HIgh traffic web applins
+--> gaming appln
+AWS Service
+--------------------
+Dynamodb --> fully managed service, serverless
+
+
+--> 
+
+-->Key-value data storage
+--> dynamic schema
+--> horizontal scaling
+--> supports  Eventual Consistency & Strong Consistency
+
+Key-value
+In-memory
+Graph
+
+RDS Connection from EC2
+--------------------------------
+mysql -h demodb.c1ivjjrynlj7.us-east-1.rds.amazonaws.com -P 3306 -u dbadmin -p <password>
+
+show databases;
+use databases;
+show tables;
+drop database;
+select * from table_name;
+create table stud ( name char,id int);
+insert into stud (name,id)values(s,23);
+
+Dynamodb
+----------------
+read capacity unit
+--------------------
+--> it is equals 1 strongly consistent read per sec or 2 eventually consistent read per sec for an item upto 4kb in size
+write capacity unit
+----------------------
+-> is equal to 1 write per sec for an item upto 1 kb in size
+
+ElastiCache
+-------------
+--> is a distributed in-memory data store & cache service
+--> fully managed
+--> Redis & memcached compatible service
+--> it delivers real-time ,cost-optimized performance for modern applications
+--> ElastiCache is a key-value store with sub-millisecond latency
+
+USe Case
+---------------
+Online media streaming
+Conducting real-time analytics while customers shop on ecommerce sites
+Processing & relaying messages on instant messaging platforms
+
+ElastiCache for Redis
+-----------------------------
+--> automatic detection of cache node failure & also recovery
+--> multi-az for failed primary cluster to a read replica
+--> supports encryption in transit & rest
+--> it manages backup ,s/w patching
+
+RedShift
+-------------
+--> datawarehouse service
+--> used for analytic queries
+
+Cloudfront 
+---------------
+--> CDN
+--> content delivery network
+--> it is used to distribute content to enduser at low letency using edge location
+
+Cloudwatch
+--------------
+-->Monitoring service
+--> resource utilization
+--> used to collect metrics & it can keep track of metrics
+--> std metrics & custom metrics
+--> create dashboard
+50 EC2 instance running  --> CPU util
+--> configure to send notification using SNS
+ex:- CPU > 80% --> notify on mail
+--> create an alarm or alert 
+ex:- RDS failover to stanby --> notify 
+EC2 status change --> take action
+snapshot of EBS vol when it is attched to instance --> CW alarm trigger --> lambda function
+shutdown all idle instance
+--> create a billing alert based on cost & usage
+--> keeps logs of multiple services
+--> define rules for an event or based on schedule
+--> usefull Automating
+
+parameters of CW metrics
+-----------------------------
+1) Metric name & value
+2) Namespace --> related metrics grouped together so that they can be easily monitored
+3)Dimensions - Name/value pairs that categorize the metrics
+ex:- instance id & dimensions of CPU
+4) period - specified in time in which the metric was collected
+
+CW monitoring types
+========================\
+1) Basic monitoring --> free, very few metrics , polling every 5 mins,retention is 14 days
+2) Detailed monitoring --> chargeable, lot of metrics, polling every min, retention is 455 days
+
+Hypervisor cannot report Mem until & EBS vol free space to CW
+
+Custom metrics
+--------------------
+--> created by user
+--> ex: Mem util
+
+CW alarm status
+--------------------
+1) OK
+2) ALARM
+3) insufficient data
+
+CPU < 20%
+
+demo --> shutdown idle instance
 
 
 
+SNS
+-----
+--> simple notification service
+--> pub/sub based notification service
+--> marketing notification 
+--> real time event notification 
+--> full managed service
+Topic --> subject
 
+9/7/2023
+Cloudwatch custom metrics
+---------------------------------
 
+yum install perl-Switch  perl-DateTime   perl-Sys-Syslog   perl-LWP-Protocol-https perl-Digest-SHA.x86_64
+   24  curl https://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.2.zip -O
+   25  ls
+   26  unzip CloudWatchMonitoringScripts-1.2.2.zip 
+   27  ls
+   28  cd aws-scripts-mon/
+   29  ls
+   30  ./mon-get-instance-stats.pl --recent-hours=1
+   31  ./mon-put-instance-data.pl --mem-used-incl-cache-buff --mem-util --mem-used --mem-avail
 
+Trusted Advisor
+-----------------------
+--> recommendation tool/service
+--> it compares your resources with best practices defined by aws  & provides recommendation 
+ex:- MFA not configured for root account, unused EIP is left out in your environment, s3 bucket public
 
+Cloudformation
+--------------------
+--> used to automate infrastructure deployment on AWS cloud
+--> infra deployment using a template
+--> infrastructure as a code
+--> json & yaml
+stack --> collection of resources which you want to deploy together
+template --> properties of each resource defined in a stack
 
+Use case
+----------------
+-->deploying a DR site
+--> faster deployment
+--> redundancy
+--> fresh deployment
+---> automate infra deployment
+--> creating test environment
+--> cloning the environment
+
+S3 bucket creation template
+------------------------------------
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFormation template for s3 bucket 
+    
+Resources:
+    
+  S3Bucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    Description: Creating Amazon S3 bucket from CloudFormation
+    Properties:
+      BucketName: 9thjulypgp2023abc
+      
+    
+Outputs:
+  S3Bucket:
+    Description: Bucket Created using this template.
+    Value: !Ref S3Bucket
+
+Lambda
+-----------
+--> serverless - no need to provision & manage server
+--> cost effective
+--> event driven programming
+--> deploy a function
+ex:- EBS vol snapshot is succedded --> trigger lambda
+CW alarm--> trigger lambda
+photos upload --> s3 bucket --> trigger lambda --> create thumbnails --> dest s3 bucket
+--> charges are based on execution time
+--> lambda scales automatically
+ex: Alexa
+
+Handler
+---------
+--> specific code method
+
+Version
+---------
+--> publish version
+
+Alias
+-------
+--> one or more alias can be created for func
+
+Layer
+------
+--> is a .zip file archive that can contain addln code or content
+e:- libraries, custom runtime, data, configuration files
+
+Cost
+---------
+billing is metered in increments of one millisec
+
+mem --> 128MB to 10240MB
+
+execution time for lambda function --> upto 15mins
+
+Kinesis
+-----------
+--> Analytics
+
+SQS(simple queue service)
+-----------------------------------
+--> fully managed message queue service
+--> decouple the environment/appln
+--> message has to be pulled by the receiveing component
+--> visibility time out
+-> 256kb msg size
+--> msg --> retention --> 14 days
+
+API gateway
+---------------
+API --> helps appln commn with each other 
+App1---> Api ----> App2
+
+--> it is used to protect APIs traffic
+--> managed service
+--> create ,maintain,publich,secure,monitor your REST & websocket api
+
+EFS
+------
+--> its an NFS in aws cloud
+--> distributed shared file system storage
+--> simple 
+--> serverless
+--> grow & shrink automatically
+--> massive prallel shared access
+--> EFS supported across AZ & across VPC
+--> linux OS
+FSx --> windows
+
+Linux OS
+-----------------
+ yum install amazon-efs-utils -y
+mkdir efs
+
+Hybrid N/w
+-------------
+VPN --> Virtual private network
+1) site to site VPN --> limited to max 1.25Gbps connection, encrypted in transit
+2) Client VPN
+
+DC --> dedicated private connection 
+--> sub-1,1,10,100Gbps connections options , not encrypted by default, 
+
+Transit gateway
+----------------------
+--> enables us to connect multiple VPC & on-prem n/w to single  gateway
+
+Storage gateway
+------------------
+--> extends on-prem storage to aws cloud
+
+security services
+------------------
+1)guard duty --> threat detection service
+2)inspector --> security assessment service
+3) detective --> identifying the root cause of potential security issues
+4) security hub --> provides a comprehensive view of security state in AWS 
+5) secret manager --> used to store & manage secrets (credentials) secretly
+
+Containers
+-------------
+--> lib
+-> dependency
+
+builder --technology used to build a container
+engine --> technology used to run a container
+Orchestration --> technology used to manage multiple containers
+
+ECR --> for private registry
+ECS --> elastic container service 
+conatiner Orchestration service
+fargate--> is a serverless service
 
